@@ -1,3 +1,5 @@
 .env
 *.env
+VSC2 - Shortcut.lnk
+*.lnk
 __pycache__/

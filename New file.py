@@ -31,19 +31,53 @@ def terminal_input():
                 kirim_ke_discord(teks),
                 client.loop
             )
+    
+# def cooldown_timer():
+#     global cooldown, line
+#     while cooldown:
+#         time.sleep(0.9)
+#         if lines:
+#             line = "\n".join(lines)
+#             asyncio.run_coroutine_threadsafe(
+#                 kirim_ke_discord(line),
+#                 client.loop
+#             )
+#             cooldown = False        
+#         else:
+#             cooldown = False
+
+# cooldown = False
+# lines = []   
+
 def baca_log():
+    global cooldown, lines
     with open("terraria.log", "r", encoding="utf-8", errors="ignore") as f:
         f.seek(0, os.SEEK_END)
-
         while True:
-            line = f.readline()
-            if line:
-                asyncio.run_coroutine_threadsafe(
-                    kirim_ke_discord(line.strip()),
-                    client.loop
-                )
-            else:
-                time.sleep(0.2)
+        #    if cooldown is False:
+                line = f.readline()
+                if line:
+                    asyncio.run_coroutine_threadsafe(
+                        kirim_ke_discord(line.strip()),
+                        client.loop
+                    )
+                    cooldown = True
+                    lines = []
+                else:
+                    time.sleep(0.1)
+                    
+            # else:
+            #     line = f.readline()
+            #     if line:
+            #         lines.append(line.strip())
+            #     else:
+            #         time.sleep(0.1)
+
+                
+
+
+def baca_discord():
+
 
 @client.event
 async def on_ready():
@@ -53,5 +87,6 @@ async def on_ready():
 
     threading.Thread(target=baca_log, daemon=True).start()
     threading.Thread(target=terminal_input, daemon=True).start()
+   # threading.Thread(target=cooldown_timer, daemon=True).start()
     
 client.run(DISCORD_TOKEN)
