@@ -5,6 +5,10 @@ import asyncio
 import threading 
 import subprocess
 import time
+import re
+
+# Wait for Terraria Server Start 
+time.sleep(3)
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
@@ -49,23 +53,28 @@ def terminal_input():
 # cooldown = False
 # lines = []   
 
+pattern = r"^((?:\d{1,3}\.){3}\d{1,3})(:\d+)"
 def baca_log():
     global cooldown, lines
-    with open("terraria.log", "r", encoding="utf-8", errors="ignore") as f:
+    with open("Terraria.log", "r", encoding="utf-8", errors="ignore") as f:
         f.seek(0, os.SEEK_END)
         while True:
         #    if cooldown is False:
                 line = f.readline()
                 if line:
-                    asyncio.run_coroutine_threadsafe(
-                        kirim_ke_discord(line.strip()),
-                        client.loop
-                    )
-                    cooldown = True
-                    lines = []
+                    line = re.sub(pattern, "xxx.xxx.xxx.xxx\\2", line)
+                    if line == ": \n" or line == ": " or line == ":":
+                        continue
+                    if ("<Server>" not in line) and ("Invalid command." not in line):
+                        asyncio.run_coroutine_threadsafe(
+                            kirim_ke_discord(line.strip().replace("\n", " ")),
+                            client.loop
+                        )
+                    # cooldown = True
+                    # lines = []
                 else:
                     time.sleep(0.1)
-                    
+
             # else:
             #     line = f.readline()
             #     if line:
@@ -75,18 +84,24 @@ def baca_log():
 
                 
 
-
-def baca_discord():
-
-
 @client.event
 async def on_ready():
-    print(f"Login sebagai {client.user}")
-
+    # print(f"Login as {client.user}", flush=False)
+    asyncio.run_coroutine_threadsafe(
+    kirim_ke_discord(f"Login as {client.user}"),
+    client.loop)
 
 
     threading.Thread(target=baca_log, daemon=True).start()
-    threading.Thread(target=terminal_input, daemon=True).start()
+   # threading.Thread(target=terminal_input, daemon=True).start()
    # threading.Thread(target=cooldown_timer, daemon=True).start()
-    
+
+@client.event
+async def on_message(message):
+    if message.author.bot:   # ignore bot msg
+        return
+    if message.channel.id == CHANNEL_ID:
+        print(f"say [c/7289DA:<{message.author.display_name}>] {message.content}", flush=True)
+
+
 client.run(DISCORD_TOKEN)
