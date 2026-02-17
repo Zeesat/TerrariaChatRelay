@@ -54,6 +54,10 @@ def terminal_input():
 # lines = []   
 
 pattern = r"^((?:\d{1,3}\.){3}\d{1,3})(:\d+)"
+IGNORED_PREFIXES = (
+    "Saving world data: ",
+)
+
 def baca_log():
     global cooldown, lines
     with open("Terraria.log", "r", encoding="utf-8", errors="ignore") as f:
@@ -64,6 +68,8 @@ def baca_log():
                 if line:
                     line = re.sub(pattern, "xxx.xxx.xxx.xxx\\2", line)
                     if line == ": \n" or line == ": " or line == ":":
+                        continue
+                    if line.startswith(IGNORED_PREFIXES):
                         continue
                     if ("<Server>" not in line) and ("Invalid command." not in line):
                         asyncio.run_coroutine_threadsafe(
@@ -99,6 +105,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.author.bot:   # ignore bot msg
+        return
+    if message.content == "!Stolas exit":
+        print("exit", flush=True)
         return
     if message.channel.id == CHANNEL_ID:
         print(f"say [c/7289DA:<{message.author.display_name}>] {message.content}", flush=True)
