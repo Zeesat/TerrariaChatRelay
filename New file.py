@@ -106,8 +106,10 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:   # ignore bot msg
         return
-    if message.content == "!Stolas exit":
-        print("exit", flush=True)
+    if message.content.startswith("!Stolas"):
+        stolas_text = message.content[len("!Stolas"):].strip()
+        if stolas_text:
+            print(stolas_text, flush=True)
         return
     if message.channel.id == CHANNEL_ID:
         print(f"say [c/7289DA:<{message.author.display_name}>] {message.content}", flush=True)
