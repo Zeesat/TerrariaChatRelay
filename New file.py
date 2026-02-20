@@ -56,6 +56,9 @@ def terminal_input():
 pattern = r"^((?:\d{1,3}\.){3}\d{1,3})(:\d+)"
 IGNORED_PREFIXES = (
     "Saving world data: ",
+    "Resetting game objects ",
+    "Loading world data: ",
+    "Settling liquids ",
 )
 
 def baca_log():
@@ -66,11 +69,11 @@ def baca_log():
         #    if cooldown is False:
                 line = f.readline()
                 if line:
-                    line = re.sub(pattern, "xxx.xxx.xxx.xxx\\2", line)
-                    if line == ": \n" or line == ": " or line == ":":
-                        continue
                     if line.startswith(IGNORED_PREFIXES):
                         continue
+                    if line == ": \n" or line == ": " or line == ":":
+                        continue
+                    line = re.sub(pattern, "xxx.xxx.xxx.xxx\\2", line)
                     if ("<Server>" not in line) and ("Invalid command." not in line):
                         asyncio.run_coroutine_threadsafe(
                             kirim_ke_discord(line.strip().replace("\n", " ")),
@@ -106,13 +109,14 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:   # ignore bot msg
         return
-    if message.content.startswith("!Stolas"):
-        stolas_text = message.content[len("!Stolas"):].strip()
-        if stolas_text:
-            print(stolas_text, flush=True)
-        return
     if message.channel.id == CHANNEL_ID:
+        if message.content.startswith("!Stolas"):
+            stolas_text = message.content[len("!Stolas"):].strip()
+            if stolas_text:
+                print(stolas_text, flush=True)
+            return
         print(f"say [c/7289DA:<{message.author.display_name}>] {message.content}", flush=True)
+        
 
 
 client.run(DISCORD_TOKEN)
