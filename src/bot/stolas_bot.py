@@ -73,12 +73,14 @@ def baca_log():
                         continue
                     if line == ": \n" or line == ": " or line == ":":
                         continue
+                    if ("<Server>" not in line) and ("Invalid command." in line):
+                        continue
                     line = re.sub(pattern, "xxx.xxx.xxx.xxx\\2", line)
-                    if ("<Server>" not in line) and ("Invalid command." not in line):
-                        asyncio.run_coroutine_threadsafe(
-                            kirim_ke_discord(line.strip().replace("\n", " ")),
-                            client.loop
-                        )
+                    asyncio.run_coroutine_threadsafe(
+                        kirim_ke_discord(line.strip().replace("\n", " ")),
+                        client.loop
+                    )
+                    
                     # cooldown = True
                     # lines = []
                 else:
